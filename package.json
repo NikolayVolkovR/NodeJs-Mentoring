@@ -3,9 +3,22 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "task1": "nodemon --exec babel-node src/module1/task1.js",
+    "task1-2": "nodemon --exec babel-node src/module1/task1-2.js",
+    "task2": "nodemon --exec babel-node src/module1/task2.js"
   },
   "author": "Nikolay Volkov",
   "license": "ISC",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "csvtojson": "^2.0.10",
+    "readable-stream": "^3.6.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.11.0",
+    "@babel/node": "^7.10.5",
+    "@babel/preset-env": "^7.11.0",
+    "nodemon": "^2.0.4"
+  }
 }
