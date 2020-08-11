@@ -1,6 +1,16 @@
 // Дополнительный вариант
 
-const stream = require('stream');
+import { Transform } from 'stream';
+
+const transformer = new Transform({
+    transform(chunk, encoding, callback) {
+        callback(null, `${chunk.reverse().toString().trim()}\n\n`)
+    }
+});
+
+process.stdin.pipe(transformer).pipe(process.stdout);
+
+/*const stream = require('stream');
 const Duplex = stream.Duplex || require('readable-stream').Duplex;
 
 const duplex = new Duplex();
@@ -11,11 +21,12 @@ duplex.on('readable', () => {
     console.log(chunk);
 });
 
-process.stdin.pipe(duplex).pipe(process.stdout);
+process.stdin.pipe(duplex).pipe(process.stdout);*/
 
 /*
-// readable.pipe(gzip).pipe(writable);
 // process.stdin.pipe(process.stdout);
+
+// readable.pipe(gzip).pipe(writable);
 process.stdin.on('data', (data) => {
     const value = data.toString().trim();
     if (value === 'exit') {
