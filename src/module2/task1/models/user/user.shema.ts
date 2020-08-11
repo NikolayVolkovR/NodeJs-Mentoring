@@ -1,6 +1,5 @@
 export const userCreateSchema = {
     type: 'object',
-    additionalProperties: false,
     required: ['login', 'password', 'age'],
     items: {
         login: {

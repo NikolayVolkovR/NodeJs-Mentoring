@@ -8,12 +8,15 @@
     "m1-task1": "nodemon --exec babel-node src/module1/task1.js",
     "m1-task1-2": "nodemon --exec babel-node src/module1/task1-2.js",
     "m1-task2": "nodemon --exec babel-node src/module1/task2.js",
-    "task2": "nodemon --exec babel-node src/module2/task1"
+    "task2": "nodemon --exec babel-node src/module2/task1",
+    "dev": "nodemon --watch 'src/module2/**/*.ts' --exec ts-node src/module2/task1"
   },
   "author": "Nikolay Volkov",
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@types/express": "^4.17.7",
+    "@types/uuid": "^8.0.1",
     "ajv": "^6.12.3",
     "body-parser": "^1.19.0",
     "csvtojson": "^2.0.10",
@@ -34,6 +37,7 @@
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "ts-node": "^8.10.2"
   }
 }
