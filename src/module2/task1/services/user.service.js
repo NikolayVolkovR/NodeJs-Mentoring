@@ -22,10 +22,16 @@ export const handleUserCreate = (user) => {
 
     return user;
 };
+
 export const handleUserDelete = (userId) => {
     users.forEach((user) => {
         if (user.id === userId) {
             user.isDeleted = true;
         }
     })
+};
+
+export const handleErrors = (err, req, res, next) => {
+    console.error(err.stack);
+    res.sendStatus(500).render('error', { error: err });
 };

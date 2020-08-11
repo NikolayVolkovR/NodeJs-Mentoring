@@ -1,6 +1,10 @@
-import {handleUserCreate, handleUserDelete} from "../services";
+import {handleUserCreate, handleUserDelete} from "../services/user.service";
 import {users} from "../data";
-import { findUserById, handleUserUpdate, findUsersAutoSuggest } from "../services";
+import { findUserById, handleUserUpdate, findUsersAutoSuggest } from "../services/user.service";
+import Ajv from 'ajv';
+import { userCreateSchema } from "../validation-shemas/user.shema";
+
+const ajv = new Ajv({ allErrors: true });
 
 export const userGetAllController = (req, res) => {
     res.json(users)
@@ -33,6 +37,20 @@ export const usersGetAutoSuggestController = (req, res) => {
 };
 
 export const userCreateController = (req, res) => {
+    const validate = ajv.compile(userCreateSchema);
+    const isValid = validate(req.body);
+
+    if (!isValid) {
+        res.sendStatus(400).json(validate.errors)
+    }
+
+    const user = handleUserCreate(req.body);
+
+    res.location(`/user/${user.id}`);
+    res.sendStatus(201).end();
+};
+
+/*export const userCreateController = (req, res) => {
     if (req.body === {}) {
         res.sendStatus(400).end();
     }
@@ -41,7 +59,7 @@ export const userCreateController = (req, res) => {
 
     res.location(`/user/${user.id}`);
     res.sendStatus(201).end();
-};
+};*/
 
 export const userUpdateController = (req, res) => {
     const data = req.body;

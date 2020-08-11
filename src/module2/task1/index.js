@@ -5,8 +5,8 @@ import {
     userGetAllController,
     userGetByIdController,
     userUpdateController
-} from "./controllers";
-import {users} from "./data";
+} from "./controllers/user.controller";
+import { handleErrors } from "./services/user.service";
 
 const express = require('express');
 const app = express();
@@ -30,3 +30,4 @@ router.route('/user/:id')
     .delete(userDeleteController);
 
 app.use('/', router);
+app.use(handleErrors);
