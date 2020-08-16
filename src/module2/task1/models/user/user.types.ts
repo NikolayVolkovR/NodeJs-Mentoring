@@ -1,19 +1,19 @@
 export interface userUpdateProps {
-    login?: string;
-    password?: string;
-    age?: number;
+  login?: string;
+  password?: string;
+  age?: number;
 }
 
 export interface userCreateProps {
-    login: string;
-    password: string;
-    age: number;
+  login: string;
+  password: string;
+  age: number;
 }
 
 export interface userProps {
-    id: string;
-    login: string;
-    password: string;
-    age: number;
-    isDeleted: boolean;
+  id: string;
+  login: string;
+  password: string;
+  age: number;
+  isDeleted: boolean;
 }

@@ -1,60 +1,35 @@
-export const userCreateSchema = {
-    type: 'object',
-    required: ['login', 'password', 'age'],
-    items: {
-        login: {
-            type: 'string'
-        },
-        password: {
-            type: 'string'
-        },
-        age: {
-            type: 'number'
-        }
-    }
-};
-
-/*user = {
-    id: string;
-    login: string;
-    password: string;
-    age: number;
-    isDeleted: boolean;
-}*/
-
-/*
-export const userCreateSchema = {
+export const userSchema = {
+  properties: {
     login: {
-        type: "string",
-        required: true,
+      type: 'string',
     },
     password: {
-        type: "string",
-        required: true,
+      type: 'string',
+      pattern: '(?=.*\\d)(?=.*[a-z])[a-z\\d]{6,}$',
+      flags: 'gi',
+      errorMessage: 'Password should be at least 6 characters and have digits and letters.',
     },
     age: {
-        type: "number",
-        required: true,
-    }
-};*/
-
-/*
-export const userCreateSchema = {
-    "type": "object",
-    "properties": {
-        "login": {
-            "type": "string"
-        },
-        "password": {
-            "type": "string"
-        },
-        "age": {
-            "type": "number"
-        }
+      type: 'number',
+      minimum: 4,
+      maximum: 130,
+      errorMessage: 'Age should be more than 4 and less than 131',
     },
-    "required": ["login", "password", "age"],
+  },
 };
-*/
 
+export const userCreateSchema = {
+  required: ['login', 'password', 'age'],
+  ...userSchema,
+};
 
-
+export const usersAutoSuggestSchema = {
+  properties: {
+    login: {
+      type: 'string',
+    },
+    limit: {
+      type: 'number',
+    },
+  },
+};

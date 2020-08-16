@@ -1,12 +1,12 @@
-const fs = require('fs');
-const zlib = require('zlib');
+const fs = require("fs");
+const zlib = require("zlib");
 const fsPromises = fs.promises;
-const filePath = './examples/filesystem-and-streams-test.js';
-const options = 'utf8';
-const readingFileText = 'Reading file...';
-const writingFilePath = './examples/some-test-file.txt';
-const gzFilePath = './examples/out.txt.gz';
-const { pipeline } = require('stream');
+const filePath = "./examples/filesystem-and-streams-test.js";
+const options = "utf8";
+const readingFileText = "Reading file...";
+const writingFilePath = "./examples/some-test-file.txt";
+const gzFilePath = "./examples/out.txt.gz";
+const { pipeline } = require("stream");
 
 /*
 const fileContent = fs.readFileSync('./examples/event-loop.js', options);

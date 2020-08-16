@@ -1,11 +1,11 @@
 // Дополнительный вариант
 
-import { Transform } from 'stream';
+import { Transform } from "stream";
 
 const transformer = new Transform({
-    transform(chunk, encoding, callback) {
-        callback(null, `${chunk.reverse().toString().trim()}\n\n`)
-    }
+  transform(chunk, encoding, callback) {
+    callback(null, `${chunk.reverse().toString().trim()}\n\n`);
+  },
 });
 
 process.stdin.pipe(transformer).pipe(process.stdout);

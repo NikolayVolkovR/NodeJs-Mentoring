@@ -7,9 +7,6 @@ app.all('/', (req, res) => { // app.get ...
     res.json( { ok: true} );
 });*/
 
-
-
-
 /*
 const express = require('express');
 const app = express();
@@ -28,8 +25,6 @@ router.get('/employees/:id', (req, res) => {
 });
 
 app.use('/v2/', router);*/
-
-
 
 /*
 const express = require('express');
@@ -60,7 +55,6 @@ router.get('/employees/:id', (req, res) => {
 });
 
 app.use('/', router);*/
-
 
 /*
 // методы подряд после router.route

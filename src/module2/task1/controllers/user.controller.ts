@@ -1,92 +1,75 @@
 import {
-    findUserById,
-    findUsersAutoSuggest,
-    handleUserCreate,
-    handleUserDelete,
-    handleUserUpdate
-} from "../services/user.service";
-import {users} from "../models/data";
+  findUserById,
+  findUsers,
+  handleUserCreate,
+  handleUserDelete,
+  handleUserUpdate,
+} from '../services/user.service';
+import { users } from '../models/user/users.data';
 import Ajv from 'ajv';
-import {Request, Response} from 'express';
-import {isEmptyObject} from "../helpers/helpers";
-import { userCreateSchema } from "../models/user/user.shema";
+import { default as ajvErrors } from 'ajv-errors';
+import { RequestHandler } from 'express';
+import { userCreateSchema, usersAutoSuggestSchema, userSchema } from '../models/user/user.shema';
 
 const ajv = new Ajv({ allErrors: true });
+ajvErrors(ajv);
 
-export const userGetAllController = (req: Request, res: Response) => {
-    res.json(users)
+export const getUsersController: RequestHandler = (req, res) => {
+  return res.json(users);
 };
 
-export const userGetByIdController = (req: Request, res: Response) => {
-    const user = findUserById(req.params.id);
+export const userGetByIdController: RequestHandler = (req, res) => {
+  const userId = req.params.id;
+  const user = findUserById(userId);
 
-    if (user === null) {
-        res.sendStatus(400).end();
-    } else {
-        res.json(user);
-    }
+  if (user === undefined) {
+    return res.status(400).json({ status: 400, error: `Not found User with id ${userId}` });
+  }
+  res.status(200).json({ status: 200, user: user });
 };
 
-export const usersGetAutoSuggestController = (req: Request, res: Response) => {
-    const {limit, value} = req.body;
+export const usersGetAutoSuggestController: RequestHandler = (req, res) => {
+  const validate = ajv.compile(usersAutoSuggestSchema);
+  const { limit, login } = req.body;
+  const isValid = validate(req.body);
 
-    if (limit === undefined || value === undefined) {
-        res.sendStatus(400).end();
-    } else {
-        const users = findUsersAutoSuggest(limit, value);
+  if (!isValid) {
+    return res.status(400).json({ status: 400, errors: validate.errors });
+  }
 
-        if (users === null) {
-            res.sendStatus(400).end();
-        } else {
-            res.json(users);
-        }
-    }
-
+  const users = findUsers(limit, login);
+  res.status(200).json({ status: 200, users: users });
 };
 
-export const userCreateController = (req: Request, res: Response) => {
-    const validate = ajv.compile(userCreateSchema);
-    const isValid = validate(req.body);
+export const userCreateController: RequestHandler = (req, res) => {
+  const validate = ajv.compile(userCreateSchema);
+  const isValid = validate(req.body);
 
-    if (!isValid) {
-        console.log('___NOT_valid___');
-        res.status(400).json(validate.errors)
-    } else {
-        console.log('+++valid+++');
-        const user = handleUserCreate(req.body);
+  if (!isValid) {
+    return res.status(400).json({ status: 400, errors: validate.errors });
+  }
 
-        res.location(`/user/${user.id}`);
-        res.sendStatus(201).end();
-    }
+  const user = handleUserCreate(req.body);
+
+  res.location(`/users/${user.id}`);
+  res.status(201).json({ status: '201', user: user });
 };
 
-/*export const userCreateController = (req: Request, res: Response) => {
-    const data = req.body;
+export const userUpdateController: RequestHandler = (req, res) => {
+  const data = req.body;
+  const validate = ajv.compile(userSchema);
+  const isValid = validate(data);
 
-    if (isEmptyObject(data)) {
-        res.sendStatus(400).end();
-    } else {
-        const user = handleUserCreate(data);
+  if (!isValid) {
+    res.status(400).json({status: 400, error: validate.errors})
+  }
 
-        res.location(`/user/${user.id}`);
-        res.sendStatus(201).end();
-    }
-};*/
-
-export const userUpdateController = (req: Request, res: Response) => {
-    const data = req.body;
-    const user = findUserById(req.params.id);
-
-    if (isEmptyObject(data) || user === undefined) {
-        res.sendStatus(400).end();
-    } else {
-        handleUserUpdate(req.params.id, data);
-
-        res.json(user);
-    }
+  const user = findUserById(req.params.id); // todo model.update(data)
+  handleUserUpdate(req.params.id, data);
+  res.status(200).json({status: 200, user: user})
 };
 
-export const userDeleteController = (req: Request, res: Response) => {
-    handleUserDelete(req.params.id);
-    res.end()
+export const userDeleteController: RequestHandler = (req, res) => {
+  handleUserDelete(req.params.id);
+  res.end();
 };

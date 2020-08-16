@@ -1,8 +1,8 @@
-const EventEmitter = require('events');
+const EventEmitter = require("events");
 class MyEmitter extends EventEmitter {}
 const myEmitter = new MyEmitter();
 
-const handler1 = () => console.log('handler1');
+const handler1 = () => console.log("handler1");
 
 /*
 const alert = () => console.log('some event');

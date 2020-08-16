@@ -1,18 +1,15 @@
-
 // Примеры из статьи https://nodejs.org/en/docs/guides/anatomy-of-an-http-transaction/
 
 // одно и то же:
-const http = require('http');
+const http = require("http");
 const server = http.createServer((request, response) => {
-    // code
+  // code
 });
 
 const server2 = http.createServer();
-server2.on('request', (request, response) => {
-    // code
+server2.on("request", (request, response) => {
+  // code
 });
-
-
 
 /*
 // http2
