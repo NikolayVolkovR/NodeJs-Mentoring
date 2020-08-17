@@ -2,35 +2,57 @@ import { users } from '../models/user/users.data';
 import { v4 as uuidv4 } from 'uuid';
 import { ErrorRequestHandler } from 'express';
 import { userCreateProps, userUpdateProps, userProps } from '../models/user/user.types';
+import { UserModel } from '../models/user/user.model';
 
-export const findUserById = (id: string) => {
-  return users.find((user) => user.id === id);
-};
+export class UserService {
+  static async getById(id: string): Promise<userProps> {
+    return await UserModel.getById(id);
+  }
 
-export const findUsers = (limit: number, loginSuggest: string) => {
-  return users
-    .filter(({ login }) => login.indexOf(loginSuggest) === 0)
-    .slice(0, limit)
-    .sort((user1, user2) => user1.login.localeCompare(user2.login));
-};
+  static async getAll(): Promise<userProps[]> {
+    return await UserModel.getAll();
+  }
 
-export const handleUserUpdate = (userId: string, data: userUpdateProps) => {
-  const index = users.findIndex(({ id }) => (id = userId));
+  static async getSuggest(limit: number, login: string): Promise<userProps[]> {
+    return await UserModel.getSuggest(limit, login);
+  }
 
-  users[index] = Object.assign(users[index], data);
-};
+  static async create({ login, password, age }: userCreateProps): Promise<userProps> {
+    const user: userProps = {
+      id: uuidv4(),
+      login,
+      password,
+      age,
+      isDeleted: false,
+    };
 
-export const handleUserCreate = (data: userCreateProps): userProps => {
-  const user = {
-    id: uuidv4(),
-    ...data,
-    isDeleted: false,
-  };
+    return await UserModel.create(user);
+  }
 
-  users.push(user);
+  static async update(userId, data: userUpdateProps): Promise<userProps> {
+    const user = await UserModel.getById(userId);
 
-  return user;
-};
+    if (user === undefined) {
+      return undefined;
+    }
+
+    return await UserModel.update(user, data);
+  }
+
+  static async delete(userId: string): Promise<void> {
+    const user = await UserModel.getById(userId);
+
+    if (user === undefined) {
+      return undefined;
+    }
+
+    return UserModel.delete(user);
+  }
+}
+
+
+
+
 
 export const handleUserDelete = (userId: string) => {
   users.forEach((user) => {
