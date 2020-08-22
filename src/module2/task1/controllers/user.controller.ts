@@ -1,68 +1,42 @@
 import { UserService } from '../services/user.service';
-import Ajv from 'ajv';
-import { default as ajvErrors } from 'ajv-errors';
-import { RequestHandler } from 'express';
-import { userCreateSchema, usersAutoSuggestSchema, userSchema } from '../models/user/user.shema';
+import { RequestHandler, Request, Response, NextFunction } from 'express';
 
-const ajv = new Ajv({ allErrors: true });
-ajvErrors(ajv);
+export class UserController {
+  static async getAll(req: Request, res: Response, next: NextFunction) {
+    const users = await UserService.getAll();
 
-export const getUsersController: RequestHandler = async (req, res) => {
-  const users = await UserService.getAll();
-  return res.json(users);
-};
-
-export const userGetByIdController: RequestHandler = async (req, res) => {
-  const userId = req.params.id;
-  const user = await UserService.getById(userId);
-
-  if (user === undefined) {
-    return res.status(400).json({ status: 400, error: `Not found User with id ${userId}` });
-  }
-  res.status(200).json({ status: 200, user: user });
-};
-
-export const usersGetAutoSuggestController: RequestHandler = async (req, res) => {
-  const validate = ajv.compile(usersAutoSuggestSchema);
-  const { limit, login } = req.body;
-  const isValid = validate(req.body);
-
-  if (!isValid) {
-    return res.status(400).json({ status: 400, errors: validate.errors });
+    return res.json(users);
   }
 
-  const users = await UserService.getSuggest(limit, login);
-  res.status(200).json({ status: 200, users: users });
-};
+  static async getById(req: Request, res: Response, next: NextFunction) {
+    const user = res.locals.user;
 
-export const userCreateController: RequestHandler = async (req, res) => {
-  const validate = ajv.compile(userCreateSchema);
-  const isValid = validate(req.body);
-
-  if (!isValid) {
-    return res.status(400).json({ status: 400, errors: validate.errors });
+    return res.status(200).json({ status: 200, user: user });
   }
 
-  const user = await UserService.create(req.body);
+  static async autoSuggest(req: Request, res: Response, next: NextFunction) {
+    const { limit, login } = req.body;
+    const users = await UserService.getSuggest(limit, login);
 
-  res.location(`/users/${user.id}`);
-  res.status(201).json({ status: '201', user: user });
-};
-
-export const userUpdateController: RequestHandler = async (req, res) => {
-  const data = req.body;
-  const validate = ajv.compile(userSchema);
-  const isValid = validate(data);
-
-  if (!isValid) {
-    return res.status(400).json({ status: 400, error: validate.errors });
+    return res.status(200).json({ status: 200, users: users });
   }
 
-  const user = await UserService.update(req.params.id, data);
-  res.status(200).json({ status: 200, user: user });
-};
+  static async create(req: Request, res: Response, next: NextFunction) {
+    const user = await UserService.create(req.body);
 
-export const userDeleteController: RequestHandler = (req, res) => {
-  UserService.delete(req.params.id);
-  res.end();
-};
+    return res.location(`/users/${user.id}`).status(201).json({ status: '201', user: user });
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction) {
+    const user = await UserService.update(req.params.id, req.body);
+
+    return res.status(200).json({ status: 200, user: user });
+  }
+
+  static async delete(req: Request, res: Response, next: NextFunction) {
+    const user = res.locals.user;
+
+    await UserService.delete(user);
+    return res.status(200).json({ status: 200 });
+  }
+}

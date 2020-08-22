@@ -1,17 +1,15 @@
 import { Router } from 'express';
-import {
-  getUsersController,
-  userCreateController,
-  usersGetAutoSuggestController,
-  userGetByIdController,
-  userDeleteController,
-  userUpdateController,
-} from '../controllers/user.controller';
+import { UserController } from '../controllers/user.controller';
+import { UserValidator } from '../validators/user/user.validator';
 
 export const userRouter = Router();
 
-userRouter.route('/users').get(getUsersController).post(userCreateController);
+userRouter.route('/users').get(UserController.getAll).post(UserValidator.create, UserController.create);
 
-userRouter.route('/users/auto-suggest').post(usersGetAutoSuggestController);
+userRouter.route('/users/auto-suggest').post(UserValidator.autoSuggest, UserController.autoSuggest);
 
-userRouter.route('/users/:id').get(userGetByIdController).put(userUpdateController).delete(userDeleteController);
+userRouter
+  .route('/users/:id')
+  .get(UserValidator.checkExits, UserController.getById)
+  .put(UserValidator.checkExits, UserValidator.update, UserController.update)
+  .delete(UserValidator.checkExits, UserController.delete);
