@@ -1,22 +1,28 @@
 import { v4 as uuidv4 } from 'uuid';
 import { ErrorRequestHandler } from 'express';
 import { userCreateProps, userUpdateProps, userProps } from '../models/user/user.types';
-import { UserModel } from '../models/user/user.model';
+import { UserModel, UserModelAbstract } from '../models/user/user.model';
 
 export class UserService {
-  static async getById(id: string): Promise<userProps> {
+  private userModel: UserModelAbstract;
+
+  constructor(userModel) {
+    this.userModel = userModel;
+  }
+
+  async getById(id: string): Promise<userProps> {
     return await UserModel.getById(id);
   }
 
-  static async getAll(): Promise<userProps[]> {
+  async getAll(): Promise<userProps[]> {
     return await UserModel.getAll();
   }
 
-  static async getSuggest(limit: number, login: string): Promise<userProps[]> {
+  async getSuggest(limit: number, login: string): Promise<userProps[]> {
     return await UserModel.getSuggest(limit, login);
   }
 
-  static async create({ login, password, age }: userCreateProps): Promise<userProps> {
+  async create({ login, password, age }: userCreateProps): Promise<userProps> {
     const user: userProps = {
       id: uuidv4(),
       login,
@@ -28,7 +34,7 @@ export class UserService {
     return await UserModel.create(user);
   }
 
-  static async update(userId, data: userUpdateProps): Promise<userProps> {
+  async update(userId, data: userUpdateProps): Promise<userProps> {
     const user = await UserModel.getById(userId);
 
     if (user === undefined) {
@@ -38,7 +44,7 @@ export class UserService {
     return await UserModel.update(user, data);
   }
 
-  static async delete(user: userProps): Promise<void> {
+  async delete(user: userProps): Promise<void> {
     await UserModel.delete(user);
   }
 }

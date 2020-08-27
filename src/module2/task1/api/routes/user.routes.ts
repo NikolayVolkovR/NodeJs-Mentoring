@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { UserController } from '../controllers/user.controller';
-import { UserValidator } from '../validators/user/user.validator';
+import { UserValidator } from '../../validators/user/user.validator';
 
 export const userRouter = Router();
 
@@ -9,7 +9,8 @@ userRouter.route('/users').get(UserController.getAll).post(UserValidator.create,
 userRouter.route('/users/auto-suggest').post(UserValidator.autoSuggest, UserController.autoSuggest);
 
 userRouter
+  .use('/users/:id', UserValidator.checkExits)
   .route('/users/:id')
-  .get(UserValidator.checkExits, UserController.getById)
-  .put(UserValidator.checkExits, UserValidator.update, UserController.update)
-  .delete(UserValidator.checkExits, UserController.delete);
+  .get(UserController.getById)
+  .put(UserValidator.update, UserController.update)
+  .delete(UserController.delete);
