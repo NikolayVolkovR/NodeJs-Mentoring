@@ -2,15 +2,17 @@ import { Router } from 'express';
 import { UserController } from '../controllers/user.controller';
 import { UserValidator } from '../../validators/user/user.validator';
 
-export const userRouter = Router();
+const route = Router();
 
-userRouter.route('/users').get(UserController.getAll).post(UserValidator.create, UserController.create);
+export default (app: Router) => {
+  app.use('/users', route);
 
-userRouter.route('/users/auto-suggest').post(UserValidator.autoSuggest, UserController.autoSuggest);
-
-userRouter
-  .use('/users/:id', UserValidator.checkExits)
-  .route('/users/:id')
-  .get(UserController.getById)
-  .put(UserValidator.update, UserController.update)
-  .delete(UserController.delete);
+  route.route('/').get(UserController.getAll).post(UserValidator.create, UserController.create);
+  route.route('/auto-suggest').post(UserValidator.autoSuggest, UserController.autoSuggest);
+  route
+    .use('/:id', UserController.checkExits)
+    .route('/:id')
+    .get(UserController.getById)
+    .put(UserValidator.update, UserController.update)
+    .delete(UserController.delete);
+};

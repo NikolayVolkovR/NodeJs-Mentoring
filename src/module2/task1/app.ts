@@ -1,14 +1,18 @@
-import { handleErrors } from './services/user.service';
 import express from 'express';
-import { userRouter } from './api/routes/user.routes';
-import { PORT, API } from './config';
-import { json } from 'body-parser';
+import { PORT } from './config';
 
-const app = express();
-app.listen(PORT, () => {
-  console.log(`Server started at http://localhost:${PORT}`);
-});
+const startServer = async () => {
+  const app = express();
 
-app.use(json());
-app.use(process.env.PORT || API.PREFIX, userRouter);
-app.use(handleErrors);
+  await require('./loaders').default({ expressApp: app });
+  app.listen(PORT, (err) => {
+    if (err) {
+      // todo logger here
+      process.exit(1);
+    }
+    console.log(`Server started at http://localhost:${PORT}`);
+  });
+};
+
+startServer();
+
