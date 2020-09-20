@@ -1,39 +1,50 @@
-import { Model } from 'sequelize';
+import { Model, Sequelize, DataTypes, BelongsToManyGetAssociationsMixin, HasManyAddAssociationMixin } from 'sequelize';
+import {GroupModel} from "../group/group.model";
 
-export default (sequelize, DataTypes) => {
-  class User extends Model {
-    public id: number;
-    public login: string;
-  }
+/*export interface UserAttributes { // todo можно добавить типы после имплементации основного функционала
+    id: number,
+    login: string,
+    password: string,
+    age?: number,
+    isDeleted: boolean,
+}*/
 
-  User.init(
-      {
-        login: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        password: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        age: {
-          type: DataTypes.INTEGER,
-          allowNull: true,
-        },
-        isDeleted: {
-          type: DataTypes.BOOLEAN,
-          allowNull: false,
-          defaultValue: false,
-        },
-      },
-      {
-        sequelize,
-        modelName: 'User',
-        timestamps: false,
-      },
-  );
+export class UserModel extends Model {
+    public id!: number;
+    public login!: string;
+    public age: number;
+    public isDeleted!: boolean;
+    public getGroups!: BelongsToManyGetAssociationsMixin<GroupModel[]>;
+    public addGroup!: HasManyAddAssociationMixin<GroupModel, number>;
+}
 
-  return User;
+export const initUserModel = (sequelize: Sequelize) => {
+    UserModel.init(
+        {
+            login: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            password: {
+                type: DataTypes.STRING,
+                allowNull: false,
+            },
+            age: {
+                type: DataTypes.INTEGER,
+                allowNull: true,
+            },
+            isDeleted: {
+                type: DataTypes.BOOLEAN,
+                allowNull: false,
+                defaultValue: false,
+            },
+        },
+        {
+            sequelize,
+            modelName: 'User',
+            timestamps: false,
+        },
+    );
+
+    return UserModel;
 };
-
-

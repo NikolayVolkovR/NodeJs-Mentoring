@@ -1,23 +1,27 @@
-import { Sequelize, DataTypes } from 'sequelize';
-// import { Client } from 'pg';
+/*import { Sequelize, DataTypes, QueryInterface } from 'sequelize';
 
 const env = process.env.NODE_ENV || 'development';
 const config = require(__dirname + '/../config/config.json')[env];
 
 let connection;
 if (config.use_env_variable) {
-  connection = new Sequelize(process.env[config.use_env_variable], config);
+    connection = new Sequelize(process.env[config.use_env_variable], config);
 } else {
-  connection = new Sequelize(config.database, config.username, config.password, config);
+    connection = new Sequelize(config.database, config.username, config.password, config);
 }
 
-export const sequelize = connection;
+export const sequelize = connection;*/
 
-export const initTable = async () => {
-  const queryInterface = sequelize.getQueryInterface();
+/*
+// QueryInterface way:
 
-  await queryInterface.dropTable('Users');
+const dropTables = async (queryInterface: QueryInterface): Promise<[void, void]> => {
+  await queryInterface.dropTable('UserGroup');
+  await queryInterface.dropTable('Groups');
+  return Promise.all([queryInterface.dropTable('Users'), queryInterface.dropTable('Permission')]);
+};
 
+const createUsers = async (queryInterface: QueryInterface): Promise<void> => {
   await queryInterface.createTable('Users', {
     id: {
       allowNull: false,
@@ -61,39 +65,76 @@ export const initTable = async () => {
       age: 45,
     },
   ]);
+};
 
-  /*const db = new Client({
-    host: '127.0.0.1',
-    user: 'postgres',
-    password: 'root',
-    database: 'test',
+const createGroups = async (queryInterface: QueryInterface): Promise<void> => {
+  await queryInterface.createTable('Groups', {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    permissions: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    }
   });
 
-  await db.connect();
-  client
-      .query("SELECT EXISTS (SELECT * FROM pg_class WHERE relname = 'Users')")
-      .then(res => console.log(res.rows[0].exists))
-      .catch(e => console.error(e.stack))
-  client
-      .query('SELECT * FROM "Users"')
-      .then((res) => console.log(res))
-      .catch(e => console.error('===ERROR===', e.stack))
-  db
-      .query('DROP TABLE IF EXISTS "Users"')
-      .query('')
-      .then((res) => console.log(res))
-      .catch(e => console.error('===ERROR===', e.stack))
-  const insertUsersQuery = {
-    text: 'INSERT INTO "Users"(login, password, age) VALUES($1, $2, $3)',
-    values: ['Max', 'MaxPassword1', 50],
-  };
+  await queryInterface.bulkInsert('Groups', [
+    {
+      name: 'User',
+      permissions: '[READ]'
+    },
+    {
+      name: 'Developer',
+      permissions: '[READ, WRITE]'
+    },
+    {
+      name: 'Admin',
+      permissions: '[READ, DELETE]'
+    },
+  ]);
+};
 
-  // await db.query('DROP TABLE IF EXISTS "Users"');
-  db
-      .query('CREATE TABLE users ()')
-      .then(res => console.log(res))
-      .catch( e => console.log(e.stack));
-  // await db.query(insertUsersQuery);
+const createUserGroup = async (queryInterface: QueryInterface): Promise<void> => {
+  await queryInterface.createTable('UserGroup', {
+    id: {
+      allowNull: false,
+      autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER,
+    },
+    user_id: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Users',
+        key: 'id',
+      },
+      onDelete: 'cascade',
+    },
+    group_id: {
+      allowNull: false,
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'Groups',
+        key: 'id',
+      },
+      onDelete: 'cascade',
+    },
+  });
+};*/
 
-  const users = await db.query('FIND * FROM "Users"')*/
+export const initTables = async () => {
+    /*
+  QueryInterface way:
+  const queryInterface = sequelize.getQueryInterface();
+  await dropTables(queryInterface);
+  await Promise.all([createUsers(queryInterface), createGroups(queryInterface)]);
+  await createUserGroup(queryInterface);*/
 };

@@ -1,16 +1,16 @@
-export interface userUpdateProps {
+export interface UserUpdateProps {
   login?: string;
   password?: string;
   age?: number;
 }
 
-export interface userCreateProps {
+export interface UserCreateProps {
   login: string;
   password: string;
   age: number;
 }
 
-export interface userProps {
+export interface User {
   id: string;
   login: string;
   password: string;

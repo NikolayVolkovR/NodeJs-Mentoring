@@ -1,55 +1,69 @@
-import { default as User } from '../models/user/user.model';
 import { Op } from 'sequelize';
-import { userCreateProps } from '@models/user/user.types';
+import { UserCreateProps, UserUpdateProps } from '../models/user/user.types';
+import { User } from '../models/user/user.types';
+import { db } from "../database/db";
 
-export class UserRepository {
-  private model;
+export interface UserRepositoryType {
+    getAll(): Promise<User[] | null>;
+    getById(id: number): Promise<User>;
+    getSuggest(limit: number, login: string): Promise<User[] | null>;
+    create(props: UserCreateProps): Promise<User>;
+    update(id: number, data: UserUpdateProps): Promise<User>;
+    delete(id: number): Promise<void>;
+    checkExists(id: number): Promise<boolean>;
+}
 
-  constructor(sequelize, DataTypes) {
-    this.model = User(sequelize, DataTypes);
-  }
+export class UserRepository implements UserRepositoryType {
+    private model;
 
-  async getAll() {
-    return await this.model.findAll({
-        order: ["id"],
-    });
-  }
-
-  async getById(id: string) {
-    return await this.model.findByPk(id);
-  }
-
-  async getSuggest(limit: number, login: string) {
-    return await this.model.findAll({
-      where: {
-        login: {
-          [Op.like]: `%${login}%`,
-        },
-      },
-      limit: limit,
-      order: ["id"],
-    });
-  }
-
-  async create({ login, password, age }: userCreateProps) {
-    return await this.model.create({ login, password, age });
-  }
-
-  async update(id, data) {
-    const user = await this.model.findByPk(id);
-
-    if (user === null) {
-      return null;
+    constructor() {
+        this.model = db.User;
     }
 
-    Object.assign(user, data);
+    async getAll(): Promise<User[] | null> {
+        return await this.model.findAll({
+            order: ['id'],
+        });
+    }
 
-    await user.save();
-    return user;
-  }
+    async getById(id: number): Promise<User> {
+        return await this.model.findByPk(id);
+    }
 
-  async delete(id) {
-      const user = await this.model.findByPk(id);
-      return await user.destroy();
-  }
+    async getSuggest(limit: number, login: string): Promise<User[] | null> {
+        return await this.model.findAll({
+            where: {
+                login: {
+                    [Op.like]: `%${login}%`,
+                },
+            },
+            limit: limit,
+            order: ['id'],
+        });
+    }
+
+    async create({ login, password, age }: UserCreateProps): Promise<User> {
+        return await this.model.create({ login, password, age });
+    }
+
+    async update(id: number, data: UserUpdateProps): Promise<User> {
+        const user = await this.model.findByPk(id);
+
+        if (user === null) {
+            return null;
+        }
+
+        Object.assign(user, data);
+
+        return await user.save();
+    }
+
+    async delete(id: number): Promise<void> {
+        const user = await this.model.findByPk(id);
+        return await user.destroy();
+    }
+
+    async checkExists(id: number): Promise<boolean> {
+        return await this.model.findByPk(id) !== null;
+    }
 }
