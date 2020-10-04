@@ -1,5 +1,6 @@
 import { UserModel, GroupModel } from '../models';
 import { db } from './db';
+import { DataBaseError } from '../errors/DataBaseError';
 
 export const preFillTables = async () => {
     try {
@@ -58,5 +59,7 @@ export const preFillTables = async () => {
 
             await userMaria.addGroup(groupUser, { transaction: t });
         });
-    } catch (error) {}
+    } catch (error) {
+        throw new DataBaseError('Pre-fill tables error', error);
+    }
 };

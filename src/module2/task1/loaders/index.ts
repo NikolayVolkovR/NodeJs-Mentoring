@@ -1,5 +1,7 @@
 import expressLoader from './express';
+import {errorHandlerMiddleware} from "../middlewares/error-handler.middleware";
 
-export default async ({ expressApp }) => {
-  await expressLoader({ app: expressApp });
+export const initLoaders = ({ expressApp }) => {
+    expressLoader({ app: expressApp });
+    errorHandlerMiddleware(expressApp);
 };

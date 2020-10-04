@@ -1,12 +1,9 @@
 import { json } from 'body-parser';
-import routes from '../api/routes';
+import { initRoutes } from '../api/routes';
 import { API } from '../config';
 
 export default ({ app }) => {
+    app.disable('x-powered-by');
     app.use(json());
-    app.use(process.env.PORT || API.PREFIX, routes());
-    app.use(function(err, req, res, next) {
-        console.error(err.stack);
-        res.status(500).json({error: err});
-    });
+    app.use(process.env.PORT || API.PREFIX, initRoutes());
 };

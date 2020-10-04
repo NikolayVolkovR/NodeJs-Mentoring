@@ -1,12 +1,12 @@
 import { Op } from 'sequelize';
-import { UserCreateProps, UserUpdateProps } from '../models/user/user.types';
-import { User } from '../models/user/user.types';
-import { db } from "../database/db";
+import { UserCreateProps, UserUpdateProps, User } from '../models';
+import { db } from '../database/db';
+import { NotFoundError } from '../errors';
 
 export interface UserRepositoryType {
-    getAll(): Promise<User[] | null>;
+    getAll(): Promise<User[]>;
     getById(id: number): Promise<User>;
-    getSuggest(limit: number, login: string): Promise<User[] | null>;
+    getSuggest(limit: number, login: string): Promise<User[]>;
     create(props: UserCreateProps): Promise<User>;
     update(id: number, data: UserUpdateProps): Promise<User>;
     delete(id: number): Promise<void>;
@@ -20,17 +20,23 @@ export class UserRepository implements UserRepositoryType {
         this.model = db.User;
     }
 
-    async getAll(): Promise<User[] | null> {
+    async getAll(): Promise<User[]> {
         return await this.model.findAll({
             order: ['id'],
         });
     }
 
     async getById(id: number): Promise<User> {
-        return await this.model.findByPk(id);
+        const user = await this.model.findByPk(id);
+
+        if (user === null) {
+            throw new NotFoundError(`User ${id} not found`);
+        }
+
+        return user;
     }
 
-    async getSuggest(limit: number, login: string): Promise<User[] | null> {
+    async getSuggest(limit: number, login: string): Promise<User[]> {
         return await this.model.findAll({
             where: {
                 login: {
@@ -50,7 +56,7 @@ export class UserRepository implements UserRepositoryType {
         const user = await this.model.findByPk(id);
 
         if (user === null) {
-            return null;
+            throw new NotFoundError(`User ${id} not found`);
         }
 
         Object.assign(user, data);
@@ -60,10 +66,15 @@ export class UserRepository implements UserRepositoryType {
 
     async delete(id: number): Promise<void> {
         const user = await this.model.findByPk(id);
+
+        if (user === null) {
+            throw new NotFoundError(`User ${id} not found`);
+        }
+
         return await user.destroy();
     }
 
     async checkExists(id: number): Promise<boolean> {
-        return await this.model.findByPk(id) !== null;
+        return (await this.model.findByPk(id)) !== null;
     }
 }

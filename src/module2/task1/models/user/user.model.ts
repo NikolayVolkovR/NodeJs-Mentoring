@@ -1,14 +1,6 @@
 import { Model, Sequelize, DataTypes, BelongsToManyGetAssociationsMixin, HasManyAddAssociationMixin } from 'sequelize';
 import {GroupModel} from "../group/group.model";
 
-/*export interface UserAttributes { // todo можно добавить типы после имплементации основного функционала
-    id: number,
-    login: string,
-    password: string,
-    age?: number,
-    isDeleted: boolean,
-}*/
-
 export class UserModel extends Model {
     public id!: number;
     public login!: string;

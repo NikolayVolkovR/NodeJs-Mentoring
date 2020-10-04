@@ -1,18 +1,24 @@
 import express from 'express';
 import { PORT } from './config';
-import { db } from './database/db';
-import { preFillTables } from "./database/pre-fill-tables";
+import { initLoaders } from './loaders';
+import { uncaughtExceptionHandler, unhandledRejectionHandler } from './errors';
+import {initDb} from "./database";
 
 const startServer = async () => {
     const app = express();
 
-    await require('./loaders').default({ expressApp: app });
-    await db.sequelize.sync({ force: true });
-    await preFillTables();
+    initLoaders({ expressApp: app });
+    await initDb();
 
-    app.listen(PORT, (err) => {
+    app.listen(PORT, (error: Error) => {
+        if (error) {
+            throw error;
+        }
         console.log(`Server started at http://localhost:${PORT}`);
     });
+
+    process.on('uncaughtException', uncaughtExceptionHandler);
+    process.on('unhandledRejection', unhandledRejectionHandler);
 };
 
 startServer();
