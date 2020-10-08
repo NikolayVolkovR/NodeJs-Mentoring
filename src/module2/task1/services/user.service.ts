@@ -1,15 +1,18 @@
-import { UserCreateProps, UserUpdateProps, User } from '../models/user/user.types';
+import { UserAttributes, UserCreateAttributes, UserUpdateAttributes } from '../models/user/user.types';
 import { UserRepositoryType } from '../repositories/user.repository';
-import logger from '../logger';
+import logger from '../helpers/logger';
+import { serviceLoggerDecorator } from '../helpers/decorators/service-logger.decorator';
+import jwt from 'jsonwebtoken';
 
 export interface UserServiceType {
-    getAll(): Promise<User[]>;
-    getById(id: number): Promise<User>;
-    getSuggest(limit: number, login: string): Promise<User[]>;
-    create(props: UserCreateProps): Promise<User>;
-    update(id: number, data: UserUpdateProps): Promise<User>;
+    getAll(): Promise<UserAttributes[]>;
+    getById(id: number): Promise<UserAttributes>;
+    getSuggest(limit: number, login: string): Promise<UserAttributes[]>;
+    create(props: UserCreateAttributes): Promise<UserAttributes>;
+    update(id: number, data: UserUpdateAttributes): Promise<UserAttributes>;
     delete(id: number): Promise<void>;
     checkExists(id: number): Promise<boolean>;
+    getAuthToken(login: string, password: string): Promise<string>;
 }
 
 export class UserService implements UserServiceType {
@@ -20,63 +23,48 @@ export class UserService implements UserServiceType {
         this.repository = repository;
     }
 
-    async getById(id: number): Promise<User> {
-        logger.info('Calling UserService.getById()', {
-            arguments: { id },
-        });
-
-        const user = await this.repository.getById(id);
-
-        if (user === null) {
-            throw new Error('no user here...')
-        }
-
-        return user;
+    @serviceLoggerDecorator
+    async getById(id: number): Promise<UserAttributes> {
+        return await this.repository.getById(id);
     }
 
-    async getAll(): Promise<User[]> {
-        logger.info('Calling UserService.getAll()', );
-
+    @serviceLoggerDecorator
+    async getAll(): Promise<UserAttributes[]> {
         return await this.repository.getAll();
     }
 
-    async getSuggest(limit: number, login: string): Promise<User[] | null> {
-        logger.info('Calling UserService.getSuggest()', {
-            arguments: { limit, login },
-        });
-
+    @serviceLoggerDecorator
+    async getSuggest(limit: number, login: string): Promise<UserAttributes[] | null> {
         return await this.repository.getSuggest(limit, login);
     }
 
-    async create(userDate: UserCreateProps): Promise<User> {
-        logger.info('Calling UserService.create()', {
-            arguments: { userDate },
-        });
-
+    @serviceLoggerDecorator
+    async create(userDate: UserCreateAttributes): Promise<UserAttributes> {
         return await this.repository.create(userDate);
     }
 
-    async update(id: number, data: UserUpdateProps): Promise<User> {
-        logger.info('Calling UserService.update()', {
-            arguments: { id, data },
-        });
-
+    @serviceLoggerDecorator
+    async update(id: number, data: UserUpdateAttributes): Promise<UserAttributes> {
         return await this.repository.update(id, data);
     }
 
+    @serviceLoggerDecorator
     async delete(id: number): Promise<void> {
-        logger.info('Calling UserService.delete()', {
-            arguments: { id },
-        });
-
         return await this.repository.delete(id);
     }
 
+    @serviceLoggerDecorator
     async checkExists(id: number): Promise<boolean> {
-        logger.info('Calling UserService.checkExists()', {
-            arguments: { id },
-        });
-
         return await this.repository.checkExists(id);
+    }
+
+    @serviceLoggerDecorator
+    async getAuthToken(login: string, password: string): Promise<string> {
+        const user = await this.repository.getByLoginPassword(login, password);
+        const payload = { userId: user.id };
+        const secret = process.env.JWT_SECRET_ENV;
+        const expiresIn = parseInt(process.env.JWT_EXPIRES_ENV);
+
+        return jwt.sign(payload, secret, { expiresIn });
     }
 }

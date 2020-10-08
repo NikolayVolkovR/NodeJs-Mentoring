@@ -7,6 +7,6 @@ export const initDb = async () => {
         await db.sequelize.sync({ force: true });
         await preFillTables();
     } catch (error) {
-        throw new DataBaseError('', error);
+        throw new DataBaseError('Init Database error', error);
     }
 };

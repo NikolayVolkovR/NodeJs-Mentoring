@@ -3,6 +3,8 @@ import { userCreateSchema, usersAutoSuggestSchema, userSchema } from './user.she
 import Ajv from 'ajv';
 import { default as ajvErrors } from 'ajv-errors';
 import { ValidationError } from '../../errors';
+import {userGroupsSchema} from "../user-groups/user-groups.shema";
+import {authenticateSchema} from "./user-authenticate.shema";
 
 const ajv = new Ajv({ allErrors: true });
 ajvErrors(ajv);
@@ -36,6 +38,16 @@ export class UserValidator {
 
         if (!isValid) {
             next(new ValidationError('User create', validate.errors));
+        }
+
+        next();
+    }
+
+    static async authenticate(req: Request, res: Response, next: NextFunction) {
+        const { error } = authenticateSchema.validate(req.body);
+
+        if (error !== undefined) {
+            next(new ValidationError('UserGroup addUserToGroup', {error}))
         }
 
         next();

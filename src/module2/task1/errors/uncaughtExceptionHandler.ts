@@ -1,4 +1,4 @@
-import logger from "../logger";
+import logger from "../helpers/logger";
 
 export const uncaughtExceptionHandler = (error: Error) => {
     logger.error('uncaughtException', { error });

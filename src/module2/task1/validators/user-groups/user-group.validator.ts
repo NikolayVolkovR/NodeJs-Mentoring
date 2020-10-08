@@ -4,9 +4,7 @@ import { ValidationError } from '../../errors';
 
 export class UserGroupValidator {
     static async addUsersToGroup(req: Request, res: Response, next: NextFunction) {
-        const body = req.body;
-
-        const { error } = userGroupsSchema.validate(body);
+        const { error } = userGroupsSchema.validate(req.body);
 
         if (error !== undefined) {
             next(new ValidationError('UserGroup addUserToGroup', {error}))

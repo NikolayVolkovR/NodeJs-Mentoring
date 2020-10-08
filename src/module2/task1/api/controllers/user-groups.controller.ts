@@ -6,6 +6,7 @@ import { GroupService } from '../../services/group.service';
 import { GroupRepository } from '../../repositories/group.repository';
 import { UserGroupService } from '../../services/user-group.service';
 import { UserGroupRepository } from '../../repositories/user-group.repository';
+import { controllerErrorDecorator } from '../../helpers/decorators/controller-error.decorator';
 
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
@@ -15,33 +16,30 @@ const userGroupRepository = new UserGroupRepository();
 const userGroupService = new UserGroupService(userGroupRepository);
 
 export class UserGroupsController {
+    @controllerErrorDecorator
     static async addUsersToGroup(req: Request, res: Response, next: NextFunction) {
-        try {
-            const { users, groupId }: UserGroupType = req.body;
+        const { users, groupId }: UserGroupType = req.body;
 
-            for (let userId of users) {
-                const exists = await userService.checkExists(userId);
-                if (!exists) {
-                    return res.status(400).json({
-                        status: 400,
-                        error: `User with ID ${userId} doesn't exist`,
-                    });
-                }
-            }
-
-            const groupExists = await groupService.checkExists(parseInt(groupId));
-            if (!groupExists) {
+        for (let userId of users) {
+            const exists = await userService.checkExists(userId);
+            if (!exists) {
                 return res.status(400).json({
                     status: 400,
-                    error: `Group with ID ${groupId} doesn't exist`,
+                    error: `User with ID ${userId} doesn't exist`,
                 });
             }
-
-            const adding = await groupService.addUsers(users, parseInt(groupId));
-
-            return res.json({ status: 200, text: adding });
-        } catch (error) {
-            next(error);
         }
+
+        const groupExists = await groupService.checkExists(parseInt(groupId));
+        if (!groupExists) {
+            return res.status(400).json({
+                status: 400,
+                error: `Group with ID ${groupId} doesn't exist`,
+            });
+        }
+
+        const adding = await groupService.addUsers(users, parseInt(groupId));
+
+        return res.json({ status: 200, text: adding });
     }
 }

@@ -1,6 +1,7 @@
 import { GroupModel, GroupCreateProps, GroupUpdateProps } from '../models';
 import { GroupRepositoryType } from '../repositories/group.repository';
-import logger from '../logger';
+import logger from '../helpers/logger';
+import { serviceLoggerDecorator } from "../helpers/decorators/service-logger.decorator";
 
 export interface GroupServiceType {
     getAll(): Promise<GroupModel[] | null>;
@@ -20,52 +21,38 @@ export class GroupService implements GroupServiceType {
         this.repository = repository;
     }
 
+    @serviceLoggerDecorator
     async getById(id: number): Promise<GroupModel> {
-        logger.info('Calling GroupService.getById()', {
-            arguments: { id },
-        });
         return await this.repository.getById(id);
     }
 
+    @serviceLoggerDecorator
     async getAll(): Promise<GroupModel[] | null> {
-        logger.info('Calling GroupService.getAll()', {
-            arguments: {},
-        });
         return await this.repository.getAll();
     }
 
+    @serviceLoggerDecorator
     async create(groupData: GroupCreateProps): Promise<GroupModel> {
-        logger.info('Calling GroupService.create()', {
-            arguments: { groupData },
-        });
         return await this.repository.create(groupData);
     }
 
+    @serviceLoggerDecorator
     async update(id: number, data: GroupUpdateProps): Promise<GroupModel> {
-        logger.info('Calling GroupService.update()', {
-            arguments: { id, data },
-        });
         return await this.repository.update(id, data);
     }
 
+    @serviceLoggerDecorator
     async delete(id: number): Promise<void> {
-        logger.info('Calling GroupService.delete()', {
-            arguments: { id },
-        });
         return await this.repository.delete(id);
     }
 
+    @serviceLoggerDecorator
     async checkExists(id: number): Promise<boolean> {
-        logger.info('Calling GroupService.checkExists()', {
-            arguments: { id },
-        });
         return await this.repository.checkExists(id);
     }
 
+    @serviceLoggerDecorator
     async addUsers(users: number[], groupId: number) {
-        logger.info('Calling GroupService.addUsers()', {
-            arguments: { users, groupId },
-        });
         return this.repository.addUsers(users, groupId);
     }
 }

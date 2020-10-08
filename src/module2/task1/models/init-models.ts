@@ -3,7 +3,7 @@ import { UserModel, initUserModel } from './user/user.model';
 import { GroupModel, initGroupModel } from './group/group.model';
 import { initUserGroupModel, UserGroupModel } from './user-group/user-group.model';
 
-export const initModels = (sequelize: Sequelize) => {
+export const initModels = (sequelize: Sequelize)  => {
     const User = initUserModel(sequelize);
     const Group = initGroupModel(sequelize);
     const UserGroup = initUserGroupModel(sequelize);

@@ -1,16 +1,17 @@
-import { Op } from 'sequelize';
-import { UserCreateProps, UserUpdateProps, User } from '../models';
+import Model, { Op } from 'sequelize';
+import { UserCreateAttributes, UserUpdateAttributes, UserAttributes, UserModel } from '../models';
 import { db } from '../database/db';
-import { NotFoundError } from '../errors';
+import { NotFoundError, UnauthorizedError } from '../errors';
 
 export interface UserRepositoryType {
-    getAll(): Promise<User[]>;
-    getById(id: number): Promise<User>;
-    getSuggest(limit: number, login: string): Promise<User[]>;
-    create(props: UserCreateProps): Promise<User>;
-    update(id: number, data: UserUpdateProps): Promise<User>;
+    getAll(): Promise<UserAttributes[]>;
+    getById(id: number): Promise<UserAttributes>;
+    getSuggest(limit: number, login: string): Promise<UserAttributes[]>;
+    create(props: UserCreateAttributes): Promise<UserAttributes>;
+    update(id: number, data: UserUpdateAttributes): Promise<UserAttributes>;
     delete(id: number): Promise<void>;
     checkExists(id: number): Promise<boolean>;
+    getByLoginPassword(login: string, password: string): Promise<UserModel>;
 }
 
 export class UserRepository implements UserRepositoryType {
@@ -20,23 +21,23 @@ export class UserRepository implements UserRepositoryType {
         this.model = db.User;
     }
 
-    async getAll(): Promise<User[]> {
+    async getAll(): Promise<UserAttributes[]> {
         return await this.model.findAll({
             order: ['id'],
         });
     }
 
-    async getById(id: number): Promise<User> {
+    async getById(id: number): Promise<UserAttributes> {
         const user = await this.model.findByPk(id);
 
         if (user === null) {
-            throw new NotFoundError(`User ${id} not found`);
+            throw new NotFoundError(`Not found User with id ${id}`);
         }
 
         return user;
     }
 
-    async getSuggest(limit: number, login: string): Promise<User[]> {
+    async getSuggest(limit: number, login: string): Promise<UserAttributes[]> {
         return await this.model.findAll({
             where: {
                 login: {
@@ -48,15 +49,15 @@ export class UserRepository implements UserRepositoryType {
         });
     }
 
-    async create({ login, password, age }: UserCreateProps): Promise<User> {
+    async create({ login, password, age }: UserCreateAttributes): Promise<UserAttributes> {
         return await this.model.create({ login, password, age });
     }
 
-    async update(id: number, data: UserUpdateProps): Promise<User> {
+    async update(id: number, data: UserUpdateAttributes): Promise<UserAttributes> {
         const user = await this.model.findByPk(id);
 
         if (user === null) {
-            throw new NotFoundError(`User ${id} not found`);
+            throw new NotFoundError(`UserAttributes ${id} not found`);
         }
 
         Object.assign(user, data);
@@ -68,7 +69,7 @@ export class UserRepository implements UserRepositoryType {
         const user = await this.model.findByPk(id);
 
         if (user === null) {
-            throw new NotFoundError(`User ${id} not found`);
+            throw new NotFoundError(`UserAttributes ${id} not found`);
         }
 
         return await user.destroy();
@@ -76,5 +77,24 @@ export class UserRepository implements UserRepositoryType {
 
     async checkExists(id: number): Promise<boolean> {
         return (await this.model.findByPk(id)) !== null;
+    }
+
+    async getByLoginPassword(login: string, password: string): Promise<UserModel> {
+        const user = await this.model.findOne({
+            where: {
+                login,
+                password,
+            },
+        });
+
+        if (user === null) {
+            throw new UnauthorizedError('Bad login/password combination');
+        }
+
+        if (user.isDeleted) {
+            throw new NotFoundError('User is deleted');
+        }
+
+        return user;
     }
 }

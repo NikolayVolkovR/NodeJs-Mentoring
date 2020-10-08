@@ -1,19 +1,13 @@
-export interface UserUpdateProps {
-  login?: string;
-  password?: string;
-  age?: number;
-}
+import { Optional, ModelDefined } from "sequelize";
 
-export interface UserCreateProps {
-  login: string;
-  password: string;
-  age: number;
-}
-
-export interface User {
-  id: string;
+export interface UserAttributes {
+  id: number;
   login: string;
   password: string;
   age: number;
   isDeleted: boolean;
 }
+
+export interface UserCreateAttributes extends Optional<UserAttributes, "id" | "isDeleted">{}
+
+export interface UserUpdateAttributes extends Optional<UserAttributes, "id" | "login" | "password" | "age" | "isDeleted">{}

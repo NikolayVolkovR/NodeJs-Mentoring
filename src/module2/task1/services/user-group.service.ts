@@ -1,5 +1,5 @@
 import { UserGroupRepositoryType } from '../repositories/user-group.repository';
-import logger from "../logger";
+import logger from "../helpers/logger";
 
 export interface UserGroupServiceType {}
 
