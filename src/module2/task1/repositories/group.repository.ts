@@ -1,6 +1,6 @@
-import { GroupModel, GroupUpdateProps } from '../models';
-import { db } from '../database/db';
-import { NotFoundError } from '../errors';
+import { GroupModel, GroupUpdateProps } from "../models";
+import { db } from "../database/db";
+import { NotFoundError } from "../errors";
 
 export interface GroupRepositoryType {
     getAll(): Promise<GroupModel[] | null>;
@@ -23,7 +23,7 @@ export class GroupRepository implements GroupRepositoryType {
 
     async getAll(): Promise<GroupModel[] | null> {
         return await this.model.findAll({
-            order: ['id'],
+            order: ["id"],
         });
     }
 

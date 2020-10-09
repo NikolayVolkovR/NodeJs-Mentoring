@@ -1,70 +1,85 @@
-import { UserService } from '../../services/user.service';
-import { NextFunction, Request, Response } from 'express';
-import { UserRepository } from '../../repositories/user.repository';
-import { controllerErrorDecorator } from '../../helpers/decorators/controller-error.decorator';
-
-const repository = new UserRepository();
-const service = new UserService(repository);
+import { UserServiceType } from "../../services/user.service";
+import { NextFunction, Request, Response } from "express";
+import { controllerErrorDecorator } from "../../helpers/decorators/controller-error.decorator";
+import logger from "../../helpers/logger";
+import "babel-polyfill";
 
 export class UserController {
-    @controllerErrorDecorator
-    static async checkExists(req: Request, res: Response, next: NextFunction) {
-        const id = req.params.id;
-        res.locals.user = await service.getById(parseInt(id));
-        next();
+    private service: UserServiceType;
+
+    constructor(service) {
+        logger.info("Creating UserController instance");
+        this.service = service;
+        this.checkExists = this.checkExists.bind(this);
+        this.getAll = this.getAll.bind(this);
+        this.getById = this.getById.bind(this);
+        this.autoSuggest = this.autoSuggest.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
+        this.login = this.login.bind(this);
     }
 
     @controllerErrorDecorator
-    static async getAll(req: Request, res: Response, next: NextFunction) {
-        const users = await service.getAll();
+    async checkExists(req: Request, res: Response, next: NextFunction) {
+        const id = req.params.id;
+        res.locals.user = await this.service.getById(parseInt(id));
 
-        return res.json(users);
+        return next();
     }
 
     @controllerErrorDecorator
-    static async getById(req: Request, res: Response, next: NextFunction) {
+    async getAll(req: Request, res: Response, _: NextFunction) {
+        const users = await this.service.getAll();
+
+        return res.json({ users });
+    }
+
+    @controllerErrorDecorator
+    async getById(req: Request, res: Response, _: NextFunction) {
         const id = req.params.id;
-        const user = await service.getById(parseInt(id));
+        const user = await this.service.getById(parseInt(id));
+
+        return res.json({ user });
+    }
+
+
+    @controllerErrorDecorator
+    async autoSuggest(req: Request, res: Response, _: NextFunction) {
+        const { limit, login } = req.body;
+        const users = await this.service.getSuggest(limit, login);
+
+        return res.status(200).json({ users });
+    }
+
+    @controllerErrorDecorator
+    async create(req: Request, res: Response, _: NextFunction) {
+        const user = await this.service.create(req.body);
+
+        return res.location(`/users/${user.id}`).status(201).json({ user });
+    }
+
+    @controllerErrorDecorator
+    async update(req: Request, res: Response, _: NextFunction) {
+        const id = req.params.id;
+        const user = await this.service.update(parseInt(id), req.body);
 
         return res.json({ user });
     }
 
     @controllerErrorDecorator
-    static async autoSuggest(req: Request, res: Response, next: NextFunction) {
-        const { limit, login } = req.body;
-        const users = await service.getSuggest(limit, login);
-
-        return res.status(200).json({ status: 200, users });
-    }
-
-    @controllerErrorDecorator
-    static async create(req: Request, res: Response, next: NextFunction) {
-        const user = await service.create(req.body);
-
-        return res.location(`/users/${user.id}`).status(201).json({ status: 201, user });
-    }
-
-    @controllerErrorDecorator
-    static async update(req: Request, res: Response, next: NextFunction) {
+    async delete(req: Request, res: Response, _: NextFunction) {
         const id = req.params.id;
-        const user = await service.update(parseInt(id), req.body);
-
-        return res.status(200).json({ status: 200, user });
-    }
-
-    @controllerErrorDecorator
-    static async delete(req: Request, res: Response, next: NextFunction) {
-        const id = req.params.id;
-        await service.delete(parseInt(id));
+        await this.service.delete(parseInt(id));
 
         return res.status(204).end();
     }
 
     @controllerErrorDecorator
-    static async login(req: Request, res: Response, next: NextFunction) {
+    async login(req: Request, res: Response, _: NextFunction) {
         const { login, password } = req.body;
-        const token = await service.getAuthToken(login, password);
+        const token = await this.service.getAuthToken(login, password);
 
-        return res.send(token)
+        return res.send(token);
     }
 }

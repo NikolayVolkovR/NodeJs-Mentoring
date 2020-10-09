@@ -1,23 +1,19 @@
-import { NextFunction, Request, Response } from 'express';
-import { UserGroupType } from '../../models';
-import { UserService } from '../../services/user.service';
-import { UserRepository } from '../../repositories/user.repository';
-import { GroupService } from '../../services/group.service';
-import { GroupRepository } from '../../repositories/group.repository';
-import { UserGroupService } from '../../services/user-group.service';
-import { UserGroupRepository } from '../../repositories/user-group.repository';
-import { controllerErrorDecorator } from '../../helpers/decorators/controller-error.decorator';
+import { Request, Response } from "express";
+import { UserGroupType } from "../../models";
+import { UserService } from "../../services/user.service";
+import { UserRepository } from "../../repositories/user.repository";
+import { GroupService } from "../../services/group.service";
+import { GroupRepository } from "../../repositories/group.repository";
+import { controllerErrorDecorator } from "../../helpers/decorators/controller-error.decorator";
 
 const userRepository = new UserRepository();
 const userService = new UserService(userRepository);
 const groupRepository = new GroupRepository();
 const groupService = new GroupService(groupRepository);
-const userGroupRepository = new UserGroupRepository();
-const userGroupService = new UserGroupService(userGroupRepository);
 
 export class UserGroupsController {
     @controllerErrorDecorator
-    static async addUsersToGroup(req: Request, res: Response, next: NextFunction) {
+    static async addUsersToGroup(req: Request, res: Response) {
         const { users, groupId }: UserGroupType = req.body;
 
         for (let userId of users) {

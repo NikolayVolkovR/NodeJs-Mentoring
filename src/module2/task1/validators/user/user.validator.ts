@@ -1,55 +1,60 @@
-import { Request, Response, NextFunction } from 'express';
-import { userCreateSchema, usersAutoSuggestSchema, userSchema } from './user.shema';
-import Ajv from 'ajv';
-import { default as ajvErrors } from 'ajv-errors';
-import { ValidationError } from '../../errors';
-import {userGroupsSchema} from "../user-groups/user-groups.shema";
-import {authenticateSchema} from "./user-authenticate.shema";
+import { Request, Response, NextFunction } from "express";
+import { userCreateSchema, usersAutoSuggestSchema, userUpdateSchema } from "./user.shema";
 
-const ajv = new Ajv({ allErrors: true });
-ajvErrors(ajv);
+import { ValidationError } from "../../errors";
+import { authenticateSchema } from "./user-authenticate.shema";
+import "babel-polyfill";
+
 
 export class UserValidator {
     static async autoSuggest(req: Request, res: Response, next: NextFunction) {
-        const validate = ajv.compile(usersAutoSuggestSchema);
-        const isValid = validate(req.body);
+        const { error } = usersAutoSuggestSchema.validate(req.body);
 
-        if (!isValid) {
-            next(new ValidationError('User auto-suggest', validate.errors))
+        if (error !== undefined) {
+            return next(new ValidationError("User auto-suggest", error));
         }
 
-        next();
+        return next();
     }
 
-    static async update(req: Request, res: Response, next: NextFunction) {
-        const validate = ajv.compile(userSchema);
-        const isValid = validate(req.body);
+    static update(req: Request, res: Response, next: NextFunction) {
+        const body = req.body;
+        const { error } = userUpdateSchema.validate(body);
 
-        if (!isValid) {
-            next(new ValidationError('User update', validate.errors))
+        if (error !== undefined) {
+            return next(new ValidationError("User update", error));
         }
 
-        next();
+        if (
+            body === undefined ||
+            (body.login === undefined &&
+                body.age === undefined &&
+                body.password === undefined &&
+                body.isDeleted === undefined)
+        ) {
+            return next(new ValidationError("User update", { message: "No user data" }));
+        }
+
+        return next();
     }
 
     static async create(req: Request, res: Response, next: NextFunction) {
-        const validate = ajv.compile(userCreateSchema);
-        const isValid = validate(req.body);
+        const { error } = userCreateSchema.validate(req.body);
 
-        if (!isValid) {
-            next(new ValidationError('User create', validate.errors));
+        if (error !== undefined) {
+            return next(new ValidationError("User create", error));
         }
 
-        next();
+        return next();
     }
 
     static async authenticate(req: Request, res: Response, next: NextFunction) {
         const { error } = authenticateSchema.validate(req.body);
 
         if (error !== undefined) {
-            next(new ValidationError('UserGroup addUserToGroup', {error}))
+            return next(new ValidationError("User authenticate", { error }));
         }
 
-        next();
+        return next();
     }
 }

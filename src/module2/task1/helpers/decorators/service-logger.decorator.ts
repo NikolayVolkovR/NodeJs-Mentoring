@@ -1,4 +1,4 @@
-import logger from '../logger';
+import logger from "../logger";
 
 export const serviceLoggerDecorator = (target: any, key: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;

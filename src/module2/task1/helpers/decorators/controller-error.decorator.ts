@@ -1,4 +1,4 @@
-import {NextFunction} from "express";
+import { NextFunction } from "express";
 
 export const controllerErrorDecorator = (target: any, key: string, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
@@ -7,7 +7,7 @@ export const controllerErrorDecorator = (target: any, key: string, descriptor: P
         try {
             return await originalMethod.apply(this, [req, res, next]);
         } catch (error) {
-            next(error)
+            return next(error);
         }
     };
 };

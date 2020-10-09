@@ -1,0 +1,4 @@
+{
+  "roots": ["./src/module2/task1"],
+  "testRegex": "((\\.|/*.)(test))\\.(js|ts)?$"
+}

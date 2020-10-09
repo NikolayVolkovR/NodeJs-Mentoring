@@ -1,16 +1,27 @@
-import { NextFunction, Request, Response } from 'express';
-import { GroupService } from '../../services/group.service';
-import { GroupRepository } from '../../repositories/group.repository';
-import { controllerErrorDecorator } from '../../helpers/decorators/controller-error.decorator';
-
-const repository = new GroupRepository();
-const service = new GroupService(repository);
+import { NextFunction, Request, Response } from "express";
+import { GroupServiceType } from "../../services/group.service";
+import { controllerErrorDecorator } from "../../helpers/decorators/controller-error.decorator";
+import logger from "../../helpers/logger";
+import "babel-polyfill";
 
 export class GroupController {
+    private service: GroupServiceType;
+
+    constructor(service) {
+        logger.info("Creating GroupController instance");
+        this.service = service;
+        this.checkExists = this.checkExists.bind(this);
+        this.getById = this.getById.bind(this);
+        this.getAll = this.getAll.bind(this);
+        this.create = this.create.bind(this);
+        this.update = this.update.bind(this);
+        this.delete = this.delete.bind(this);
+    }
+
     @controllerErrorDecorator
-    static async checkExists(req: Request, res: Response, next: NextFunction) {
+    async checkExists(req: Request, res: Response, next: NextFunction) {
         const id = req.params.id;
-        const group = await service.getById(parseInt(id));
+        const group = await this.service.getById(parseInt(id));
 
         if (group === null) {
             return res.status(400).json({ status: 400, error: `Not found Group with id ${id}` });
@@ -18,47 +29,43 @@ export class GroupController {
 
         res.locals.item = group;
 
-        next();
+        return next();
     }
 
     @controllerErrorDecorator
-    static async getById(req: Request, res: Response, next: NextFunction) {
+    async getById(req: Request, res: Response, _: NextFunction) {
         const id = req.params.id;
-        const group = await service.getById(parseInt(id));
+        const group = await this.service.getById(parseInt(id));
 
-        return res.json({ status: 200, group });
+        return res.json({ group });
     }
 
     @controllerErrorDecorator
-    static async getAll(req: Request, res: Response, next: NextFunction) {
-        const groups = await service.getAll();
+    async getAll(req: Request, res: Response, _: NextFunction) {
+        const groups = await this.service.getAll();
 
-        return res.json({ status: 200, groups });
+        return res.json({ groups });
     }
 
     @controllerErrorDecorator
-    static async create(req: Request, res: Response, next: NextFunction) {
-        try {
-            const group = await service.create(req.body);
+    async create(req: Request, res: Response, _: NextFunction) {
+        const group = await this.service.create(req.body);
 
-            return res.location(`/groups/${group.id}`).status(201).json({ status: 201, group });
-        } catch (error) {
-            next(error);
-        }
+        return res.location(`/groups/${group.id}`).status(201).json({ group });
     }
 
     @controllerErrorDecorator
-    static async update(req: Request, res: Response, next: NextFunction) {
-        const group = await service.create(req.body);
+    async update(req: Request, res: Response, _: NextFunction) {
+        const group = await this.service.create(req.body);
 
-        return res.location(`/groups/${group.id}`).status(201).json({ status: 201, group });
+        return res.location(`/groups/${group.id}`).status(201).json({ group });
     }
 
     @controllerErrorDecorator
-    static async delete(req: Request, res: Response, next: NextFunction) {
+    async delete(req: Request, res: Response, _: NextFunction) {
         const id = req.params.id;
-        await service.delete(parseInt(id));
+        await this.service.delete(parseInt(id));
 
-        return res.json({ status: 200 });
+        return res.status(204).end();
     }
 }

@@ -1,4 +1,4 @@
-import {CustomError} from "./CustomError";
+import { CustomError } from "./CustomError";
 
 export class DataBaseError extends CustomError {
     public error: object;

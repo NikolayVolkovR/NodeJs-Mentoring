@@ -1,10 +1,9 @@
-import { Sequelize } from 'sequelize';
-import { initModels } from '../models';
+import { Sequelize } from "sequelize";
+import { initModels } from "../models";
+import { getDbConfig } from "../config";
 
-const env = process.env.NODE_ENV || 'development';
-const config = require(__dirname + '/../config/config.json')[env];
+const config = getDbConfig();
 const sequelize = new Sequelize(config.database, config.username, config.password, config);
-
 const { User, Group, UserGroup } = initModels(sequelize);
 
 export const db = {

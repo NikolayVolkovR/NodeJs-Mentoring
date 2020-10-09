@@ -1,7 +1,7 @@
-import { Router } from 'express';
-import { initUserRoutes } from './user.routes';
-import { initGroupRoutes } from './group.routes';
-import { initUserGroupsRoutes } from './user-groups.routes';
+import { Router } from "express";
+import { initUserRoutes } from "./user.routes";
+import { initGroupRoutes } from "./group.routes";
+import { initUserGroupsRoutes } from "./user-groups.routes";
 import { initNotFoundRoute } from "./not-found.routes";
 
 export const initRoutes = () => {

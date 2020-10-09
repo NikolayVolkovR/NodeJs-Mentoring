@@ -3,14 +3,16 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
+    "lint": "eslint ./src/module2/task1",
+    "lint:fix": "eslint ./src/module2/task1 --fix",
     "tsc": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1",
     "m1-task1": "nodemon --exec babel-node src/module1/task1.js",
     "m1-task1-2": "nodemon --exec babel-node src/module1/task1-2.js",
     "m1-task2": "nodemon --exec babel-node src/module1/task2.js",
     "task2": "nodemon --exec babel-node src/module2/task1",
     "dev": "nodemon --watch 'src/module2/**/*.ts' --exec ts-node src/module2/task1",
-    "start": "cross-env JWT_SECRET_ENV=jwtsecret JWT_EXPIRES_ENV=120 nodemon src/module2/task1/app.ts"
+    "start": "nodemon src/module2/task1/app.ts",
+    "test": "cross-env NODE_ENV=test jest --config ./jest.config.json"
   },
   "author": "Nikolay Volkov",
   "license": "ISC",
@@ -37,21 +39,31 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.11.0",
+    "@babel/core": "^7.11.6",
     "@babel/node": "^7.10.5",
-    "@babel/preset-env": "^7.11.0",
+    "@babel/plugin-proposal-decorators": "^7.10.5",
+    "@babel/preset-env": "^7.11.5",
+    "@babel/preset-typescript": "^7.10.4",
+    "@types/jest": "^26.0.14",
     "@typescript-eslint/eslint-plugin": "^3.9.0",
     "@typescript-eslint/parser": "^3.9.0",
+    "babel-jest": "^26.5.2",
+    "babel-polyfill": "^6.26.0",
     "cross-env": "^7.0.2",
+    "dotenv": "^8.2.0",
+    "dotenv-parse-variables": "^1.0.1",
     "eslint": "^7.6.0",
     "eslint-config-standard": "^14.1.1",
     "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^24.1.0",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "jest": "^26.5.3",
     "nodemon": "^2.0.4",
     "prettier": "2.0.5",
     "sequelize-cli": "^6.2.0",
+    "ts-jest": "^26.4.1",
     "ts-node": "^8.10.2"
   }
 }

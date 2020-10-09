@@ -1,7 +1,9 @@
-import { GroupModel, GroupCreateProps, GroupUpdateProps } from '../models';
-import { GroupRepositoryType } from '../repositories/group.repository';
-import logger from '../helpers/logger';
+import { GroupModel, GroupCreateProps, GroupUpdateProps } from "../models";
+import { GroupRepositoryType } from "../repositories/group.repository";
+import logger from "../helpers/logger";
 import { serviceLoggerDecorator } from "../helpers/decorators/service-logger.decorator";
+import { NODE_ENV, nodeEnvType } from "../config";
+import "babel-polyfill";
 
 export interface GroupServiceType {
     getAll(): Promise<GroupModel[] | null>;
@@ -17,7 +19,10 @@ export class GroupService implements GroupServiceType {
     private repository: GroupRepositoryType;
 
     constructor(repository) {
-        logger.info('Creating new GroupService instance');
+        if (NODE_ENV !== nodeEnvType.test) {
+            logger.info("Creating new GroupService instance");
+        }
+
         this.repository = repository;
     }
 

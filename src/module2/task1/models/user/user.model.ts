@@ -6,9 +6,9 @@ import {
     BelongsToManyGetAssociationsMixin,
     HasManyAddAssociationMixin,
     Association,
-} from 'sequelize';
-import { GroupModel } from '../group/group.model';
-import { UserAttributes, UserCreateAttributes } from './user.types';
+} from "sequelize";
+import { GroupModel } from "../group/group.model";
+import { UserAttributes, UserCreateAttributes } from "./user.types";
 
 export class UserModel extends Model<UserAttributes, UserCreateAttributes> implements UserAttributes {
     public id!: number;
@@ -29,7 +29,7 @@ export const initUserModel = (sequelize: Sequelize) => {
     UserModel.init(
         {
             id: {
-                type: DataTypes.INTEGER.UNSIGNED,
+                type: DataTypes.INTEGER,
                 autoIncrement: true,
                 primaryKey: true,
             },
@@ -53,7 +53,7 @@ export const initUserModel = (sequelize: Sequelize) => {
         },
         {
             sequelize,
-            modelName: 'User',
+            modelName: "User",
             timestamps: false,
         },
     );

@@ -1,4 +1,4 @@
-import { Model, Sequelize } from 'sequelize';
+import { Model, Sequelize } from "sequelize";
 
 export class UserGroupModel extends Model {}
 
@@ -7,7 +7,7 @@ export const initUserGroupModel = (sequelize: Sequelize) => {
         {},
         {
             sequelize,
-            modelName: 'UserGroup',
+            modelName: "UserGroup",
             timestamps: false,
         },
     );

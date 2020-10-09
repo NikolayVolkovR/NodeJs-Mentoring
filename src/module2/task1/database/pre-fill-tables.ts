@@ -1,23 +1,23 @@
-import { UserModel, GroupModel } from '../models';
-import { db } from './db';
+import { UserModel, GroupModel } from "../models";
+import { db } from "./db";
 
 export const preFillTables = async () => {
     await db.sequelize.transaction(async (t) => {
         await UserModel.bulkCreate(
             [
                 {
-                    login: 'Maria',
-                    password: 'MariaPassword1',
+                    login: "Maria",
+                    password: "MariaPassword1",
                     age: 18,
                 },
                 {
-                    login: 'Pavel',
-                    password: 'PavelPassword1',
+                    login: "Pavel",
+                    password: "PavelPassword1",
                     age: 30,
                 },
                 {
-                    login: 'Evgeny',
-                    password: 'EvgenyPassword1',
+                    login: "Evgeny",
+                    password: "EvgenyPassword1",
                     age: 45,
                 },
             ],
@@ -27,15 +27,15 @@ export const preFillTables = async () => {
         await GroupModel.bulkCreate(
             [
                 {
-                    name: 'User',
+                    name: "User",
                     permissions: "['READ']",
                 },
                 {
-                    name: 'Developer',
+                    name: "Developer",
                     permissions: "['READ', 'WRITE']",
                 },
                 {
-                    name: 'Admin',
+                    name: "Admin",
                     permissions: "['READ', 'DELETE']",
                 },
             ],
@@ -44,13 +44,13 @@ export const preFillTables = async () => {
 
         const userMaria = await UserModel.findOne({
             where: {
-                login: 'Maria',
+                login: "Maria",
             },
             transaction: t,
         });
         const groupUser = await GroupModel.findOne({
             where: {
-                name: 'User',
+                name: "User",
             },
             transaction: t,
         });

@@ -1,8 +1,8 @@
-import express from 'express';
-import { PORT } from './config';
-import { initLoaders } from './loaders';
-import { uncaughtExceptionHandler, unhandledRejectionHandler } from './errors';
-import {initDb} from "./database";
+import express from "express";
+import { PORT } from "./config";
+import { initLoaders } from "./loaders";
+import { uncaughtExceptionHandler, unhandledRejectionHandler } from "./errors";
+import { initDb } from "./database";
 
 const startServer = async () => {
     const app = express();
@@ -17,8 +17,8 @@ const startServer = async () => {
         console.log(`Server started at http://localhost:${PORT}`);
     });
 
-    process.on('uncaughtException', uncaughtExceptionHandler);
-    process.on('unhandledRejection', unhandledRejectionHandler);
+    process.on("uncaughtException", uncaughtExceptionHandler);
+    process.on("unhandledRejection", unhandledRejectionHandler);
 };
 
 startServer();

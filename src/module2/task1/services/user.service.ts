@@ -1,8 +1,10 @@
-import { UserAttributes, UserCreateAttributes, UserUpdateAttributes } from '../models/user/user.types';
-import { UserRepositoryType } from '../repositories/user.repository';
-import logger from '../helpers/logger';
-import { serviceLoggerDecorator } from '../helpers/decorators/service-logger.decorator';
-import jwt from 'jsonwebtoken';
+import { UserAttributes, UserCreateAttributes, UserUpdateAttributes } from "../models/user/user.types";
+import { UserRepositoryType } from "../repositories/user.repository";
+import logger from "../helpers/logger";
+import { serviceLoggerDecorator } from "../helpers/decorators/service-logger.decorator";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET, JWT_EXPIRES } from "../config";
+import "babel-polyfill";
 
 export interface UserServiceType {
     getAll(): Promise<UserAttributes[]>;
@@ -19,7 +21,7 @@ export class UserService implements UserServiceType {
     private repository: UserRepositoryType;
 
     constructor(repository) {
-        logger.info('Creating new UserService instance');
+        logger.info("Creating new UserService instance");
         this.repository = repository;
     }
 
@@ -62,9 +64,7 @@ export class UserService implements UserServiceType {
     async getAuthToken(login: string, password: string): Promise<string> {
         const user = await this.repository.getByLoginPassword(login, password);
         const payload = { userId: user.id };
-        const secret = process.env.JWT_SECRET_ENV;
-        const expiresIn = parseInt(process.env.JWT_EXPIRES_ENV);
 
-        return jwt.sign(payload, secret, { expiresIn });
+        return jwt.sign(payload, JWT_SECRET, { expiresIn: JWT_EXPIRES });
     }
 }

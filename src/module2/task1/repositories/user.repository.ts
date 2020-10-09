@@ -1,7 +1,7 @@
-import Model, { Op } from 'sequelize';
-import { UserCreateAttributes, UserUpdateAttributes, UserAttributes, UserModel } from '../models';
-import { db } from '../database/db';
-import { NotFoundError, UnauthorizedError } from '../errors';
+import { Op } from "sequelize";
+import { UserCreateAttributes, UserUpdateAttributes, UserAttributes, UserModel } from "../models";
+import { db } from "../database/db";
+import { NotFoundError, UnauthorizedError } from "../errors";
 
 export interface UserRepositoryType {
     getAll(): Promise<UserAttributes[]>;
@@ -23,7 +23,7 @@ export class UserRepository implements UserRepositoryType {
 
     async getAll(): Promise<UserAttributes[]> {
         return await this.model.findAll({
-            order: ['id'],
+            order: ["id"],
         });
     }
 
@@ -45,7 +45,7 @@ export class UserRepository implements UserRepositoryType {
                 },
             },
             limit: limit,
-            order: ['id'],
+            order: ["id"],
         });
     }
 
@@ -88,11 +88,11 @@ export class UserRepository implements UserRepositoryType {
         });
 
         if (user === null) {
-            throw new UnauthorizedError('Bad login/password combination');
+            throw new UnauthorizedError("Bad login/password combination");
         }
 
         if (user.isDeleted) {
-            throw new NotFoundError('User is deleted');
+            throw new NotFoundError("User is deleted");
         }
 
         return user;
